@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hendon Signals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============ HENDON-INSPIRED DESIGN TOKENS ============
+     White bg, near-black (#0a0a0a) primary, refined neutrals,
+     a single premium amber accent (M&A-style),
+     Inter for everything + JetBrains Mono for data.           */
+  :root{
+    --bg:#ffffff;
+    --bg-soft:#fafaf9;
+    --bg-soft-2:#f4f3f0;
+    --ink:#0a0a0a;
+    --ink-2:#1c1c1c;
+    --muted:#6b6b67;
+    --dim:#9a9a95;
+    --border:#e7e5e0;
+    --border-2:#dcdad3;
+    --accent:#b88947;        /* Hendon-style amber/bronze */
+    --accent-soft:#f7eddb;
+    --accent-ink:#7a5524;
+    --good:#2f7d52;
+    --good-soft:#e6f1ea;
+    --warn:#b8762b;
+    --warn-soft:#fbeed7;
+    --danger:#9b2a2a;
+    --info:#2a4f8a;
+    --info-soft:#e6ecf6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:"ss01","cv11";
+    line-height:1.4;
+  }
+  .serif{font-family:'Inter',system-ui,sans-serif}
+  .mono{font-family:'JetBrains Mono',monospace}
+
+  /* ============ APP SHELL ============ */
+  .app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+
+  /* ============ SIDEBAR ============ */
+  .sidebar{
+    border-right:1px solid var(--border);
+    padding:22px 14px;
+    background:var(--bg-soft);
+    position:sticky;top:0;height:100vh;
+    display:flex;flex-direction:column;
+  }
+  .brand{display:flex;align-items:center;gap:10px;padding:6px 8px;margin-bottom:24px}
+  .brand-mark{
+    width:30px;height:30px;border-radius:6px;
+    background:var(--ink);color:#fff;
+    display:grid;place-items:center;
+    font-family:'Inter',sans-serif;font-weight:700;font-size:14px;
+    letter-spacing:-.02em;
+  }
+  .brand-name{font-family:'Inter',sans-serif;font-weight:700;font-size:14.5px;letter-spacing:-.02em;line-height:1}
+  .brand-sub{font-size:10.5px;color:var(--muted);margin-top:3px;letter-spacing:.02em}
+
+  .nav-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:0 10px;margin:18px 0 6px;font-weight:600}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 10px;border-radius:7px;color:var(--muted);
+    font-size:13.5px;font-weight:500;cursor:pointer;
+    transition:.15s;text-decoration:none;
+  }
+  .nav-item:hover{background:#efece6;color:var(--ink)}
+  .nav-item.active{background:var(--ink);color:#fff;font-weight:600}
+  .nav-item.active .badge{background:rgba(255,255,255,.14);color:#fff}
+  .nav-icon{width:15px;height:15px;flex-shrink:0;color:currentColor;opacity:.85}
+  .badge{
+    margin-left:auto;font-size:10.5px;padding:1px 7px;border-radius:999px;
+    background:#e9e6df;color:var(--muted);font-family:'JetBrains Mono',monospace;font-weight:500;
+  }
+
+  .sidebar-bottom{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+  .user{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px}
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:600;font-size:11.5px}
+  .user-name{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .user-mail{font-size:10.5px;color:var(--muted)}
+
+  /* ============ TOPBAR ============ */
+  .topbar{
+    display:flex;align-items:center;gap:14px;
+    padding:14px 28px;border-bottom:1px solid var(--border);
+    background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+    position:sticky;top:0;z-index:5;
+  }
+  .crumbs{font-size:12px;color:var(--muted);font-weight:500}
+  .crumbs b{color:var(--ink);font-weight:600}
+  .topbar-spacer{flex:1}
+  .top-stat{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .top-stat b{color:var(--ink);font-weight:600}
+  .pulse{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(47,125,82,.4);animation:pulse 1.6s infinite}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(47,125,82,.45)}
+    70%{box-shadow:0 0 0 6px rgba(47,125,82,0)}
+    100%{box-shadow:0 0 0 0 rgba(47,125,82,0)}
+  }
+
+  /* ============ HEADER ============ */
+  .header{
+    padding:30px 28px 20px;
+    display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+    border-bottom:1px solid var(--border);
+  }
+  .h-eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:8px}
+  .h-title{font-family:'Inter',sans-serif;font-size:30px;font-weight:700;letter-spacing:-.03em;margin:0;line-height:1.1}
+  .h-sub{color:var(--muted);font-size:13.5px;margin-top:8px;max-width:580px;line-height:1.55}
+  .h-actions{display:flex;gap:8px;align-items:center}
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    border:1px solid var(--border-2);background:#fff;color:var(--ink);
+    padding:8px 14px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;transition:.15s;
+    font-family:inherit;
+  }
+  .btn:hover{background:var(--bg-soft);border-color:#cfcdc6}
+  .btn-primary{
+    background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600;
+  }
+  .btn-primary:hover{background:#1c1c1c;border-color:#1c1c1c}
+  .btn-accent{
+    background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;
+  }
+  .btn-accent:hover{background:#a67835;border-color:#a67835}
+  .btn .ic{width:14px;height:14px}
+  .btn-ghost{background:transparent;border:1px solid transparent;color:var(--muted)}
+  .btn-ghost:hover{background:var(--bg-soft);color:var(--ink)}
+
+  /* ============ STAT CARDS ============ */
+  .stats{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    border-bottom:1px solid var(--border);
+  }
+  .stat{padding:18px 28px;border-right:1px solid var(--border)}
+  .stat:last-child{border-right:none}
+  .stat-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:8px;font-weight:600}
+  .stat-value{font-family:'Inter',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.03em;color:var(--ink);line-height:1}
+  .stat-value .sm{color:var(--dim);font-size:14px;font-weight:500;margin-left:4px}
+  .stat-delta{font-size:11.5px;margin-top:6px;color:var(--good);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .stat-delta.warn{color:var(--warn)}
+  .stat-delta.dim{color:var(--muted)}
+
+  /* ============ NOTE BANNER ============ */
+  .note-banner{
+    margin:18px 28px 0;padding:11px 14px;border-radius:7px;
+    background:var(--accent-soft);
+    border:1px solid #ecddb6;
+    font-size:12.5px;color:var(--accent-ink);display:flex;align-items:center;gap:10px;
+  }
+  .note-banner .tag{
+    background:var(--accent);color:#fff;font-size:10px;font-weight:700;
+    padding:2px 7px;border-radius:4px;letter-spacing:.06em;
+  }
+
+  /* ============ TOOLBAR ============ */
+  .toolbar{
+    display:flex;align-items:center;gap:10px;
+    padding:16px 28px;border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+  .search{
+    display:flex;align-items:center;gap:8px;
+    background:#fff;border:1px solid var(--border-2);
+    padding:7px 12px;border-radius:7px;flex:1;max-width:340px;
+  }
+  .search input{
+    background:none;border:none;outline:none;color:var(--ink);
+    font-family:inherit;font-size:13px;width:100%;
+  }
+  .search input::placeholder{color:var(--dim)}
+  .filter{
+    background:#fff;border:1px solid var(--border-2);
+    padding:7px 12px;border-radius:7px;font-size:12.5px;color:var(--muted);
+    display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+    font-weight:500;
+  }
+  .filter:hover{color:var(--ink);background:var(--bg-soft)}
+  .filter b{color:var(--ink);font-weight:600}
+  .filter.active{color:var(--ink);background:#f0ede6;border-color:#cfcdc6}
+  .sort{margin-left:auto;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+
+  /* ============ DASHBOARD LIST ============ */
+  .list-head{
+    display:grid;grid-template-columns:46px minmax(220px,1.4fr) 1.5fr 110px 110px 80px 80px;
+    gap:18px;padding:11px 28px;border-bottom:1px solid var(--border);
+    font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;
+    background:var(--bg-soft);
+  }
+  .list-head .right{text-align:right}
+  .row{
+    display:grid;grid-template-columns:46px minmax(220px,1.4fr) 1.5fr 110px 110px 80px 80px;
+    gap:18px;padding:18px 28px;border-bottom:1px solid var(--border);
+    align-items:center;cursor:pointer;transition:.12s;position:relative;
+  }
+  .row:hover{background:var(--bg-soft)}
+  .row::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;
+  }
+  .row.hot::before{background:var(--accent)}
+  .row.warm::before{background:var(--warn)}
+  .logo{
+    width:42px;height:42px;border-radius:8px;
+    display:grid;place-items:center;font-weight:600;font-size:14px;
+    color:#fff;letter-spacing:-.01em;border:1px solid var(--border);
+    overflow:hidden;font-family:'Inter',sans-serif;
+  }
+  .logo.l1{background:#a67835;}
+  .logo.l2{background:#1f4636;}
+  .logo.l3{background:#2a4f8a;}
+  .logo.l4{background:#7a3a3a;}
+  .logo.l5{background:#3a3a4a;}
+  .logo.l6{background:#5a4a2a;}
+  .logo.l7{background:#1c1c1c;}
+  .logo.l8{background:#5a3a2a;}
+  .co-name{font-weight:600;font-size:14.5px;letter-spacing:-.005em;color:var(--ink)}
+  .co-url{font-size:12px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px}
+  .co-url .ext{opacity:.5}
+  .signals{display:flex;flex-direction:column;gap:5px}
+  .signal-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11.5px;font-weight:500;color:var(--ink);
+    padding:3px 8px;border-radius:5px;background:#fff;border:1px solid var(--border);
+    width:max-content;max-width:100%;
+  }
+  .signal-tag .sd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+  .sd-hot{background:var(--accent)}
+  .sd-warm{background:var(--warn)}
+  .sd-info{background:var(--info)}
+  .sd-good{background:var(--good)}
+  .signal-tag .sv{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10.5px}
+  .meta-cell{font-size:12.5px;color:var(--muted)}
+  .meta-cell b{color:var(--ink);font-weight:600}
+  .meta-cell .mono{font-size:11.5px}
+  .count-pill{
+    display:inline-flex;align-items:baseline;gap:5px;
+    background:#fff;border:1px solid var(--border-2);
+    padding:4px 9px;border-radius:6px;font-family:'JetBrains Mono',monospace;
+  }
+  .count-pill b{color:var(--accent-ink);font-size:14px;font-weight:700}
+  .count-pill span{font-size:10.5px;color:var(--muted)}
+  .row-action{justify-self:end;display:flex;gap:6px}
+  .icon-btn{
+    width:30px;height:30px;border-radius:6px;background:#fff;border:1px solid var(--border-2);
+    display:grid;place-items:center;cursor:pointer;color:var(--muted);
+  }
+  .icon-btn:hover{color:var(--ink);background:var(--bg-soft)}
+  .icon-btn svg{width:14px;height:14px}
+
+  .pager{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 28px;color:var(--muted);font-size:12.5px;
+  }
+  .pager .controls{display:flex;gap:6px}
+  .page-btn{
+    width:30px;height:30px;border-radius:6px;background:#fff;border:1px solid var(--border-2);
+    display:grid;place-items:center;cursor:pointer;color:var(--muted);font-size:12px;
+  }
+  .page-btn:hover{color:var(--ink)}
+  .page-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600}
+  .chip{
+    font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;
+    background:var(--bg-soft);color:var(--muted);border:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  /* ============ TAM SPREADSHEET ============ */
+  .tam-toolbar{display:flex;align-items:center;gap:10px;padding:14px 28px;border-bottom:1px solid var(--border)}
+  .tam-toolbar .pill{font-size:11.5px;background:var(--bg-soft);padding:5px 10px;border-radius:6px;border:1px solid var(--border);color:var(--muted)}
+  .tam-toolbar .pill b{color:var(--ink);font-weight:600}
+
+  .sheet{overflow:auto;border-bottom:1px solid var(--border)}
+  table.tam{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.tam thead{background:var(--bg-soft);position:sticky;top:0}
+  table.tam th{
+    text-align:left;padding:10px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border-2);
+    font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;
+    white-space:nowrap;
+  }
+  table.tam td{
+    padding:10px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+    color:var(--ink);white-space:nowrap;
+  }
+  table.tam tr:hover td{background:var(--bg-soft)}
+  table.tam .num{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:11.5px;text-align:right;width:40px}
+  table.tam .check{width:30px}
+  table.tam .check input{accent-color:var(--ink)}
+  table.tam td.url{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11.5px}
+  table.tam td.name{font-weight:600}
+  table.tam td.empty{color:var(--dim);font-style:italic}
+  .tag{
+    display:inline-block;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;
+    background:var(--bg-soft);color:var(--muted);border:1px solid var(--border);
+  }
+  .tag.medicare{background:var(--info-soft);color:var(--info);border-color:#cad6e9}
+  .tag.medicaid{background:var(--good-soft);color:var(--good);border-color:#cae0d2}
+  .tag.private{background:var(--accent-soft);color:var(--accent-ink);border-color:#ecddb6}
+  .tag.enriched{background:var(--good-soft);color:var(--good);border-color:#cae0d2}
+  .tag.pending{background:#f0eee8;color:var(--muted);border-color:var(--border)}
+  .dot-cell{display:inline-flex;align-items:center;gap:6px}
+  .dot-cell .d{width:6px;height:6px;border-radius:50%}
+  .d-good{background:var(--good)}
+  .d-pending{background:var(--warn)}
+  .d-stale{background:var(--dim)}
+
+  /* ============ SIGNALS WORKFLOWS ============ */
+  .signals-grid{padding:24px 28px;display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .workflow-card{
+    border:1px solid var(--border);border-radius:10px;background:#fff;overflow:hidden;
+    transition:.15s;
+  }
+  .workflow-card:hover{border-color:#cfcdc6;box-shadow:0 4px 16px rgba(10,10,10,.04)}
+  .wf-header{
+    padding:16px 18px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .wf-name{font-family:'Inter',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.015em;color:var(--ink)}
+  .wf-desc{font-size:12px;color:var(--muted);margin-top:3px}
+  .wf-toggle{
+    display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--good);font-weight:600;
+    background:var(--good-soft);padding:3px 10px;border-radius:999px;border:1px solid #cae0d2;
+  }
+  .wf-toggle.off{color:var(--muted);background:var(--bg-soft);border-color:var(--border)}
+  .wf-blocks{padding:18px;display:flex;flex-direction:column;gap:8px}
+  .wf-step{
+    display:flex;align-items:flex-start;gap:12px;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-soft);
+    position:relative;
+  }
+  .wf-step + .wf-step::before{
+    content:'';position:absolute;left:25px;top:-9px;height:8px;width:1px;background:var(--border-2);
+  }
+  .wf-icon{
+    width:28px;height:28px;border-radius:6px;background:#fff;border:1px solid var(--border);
+    display:grid;place-items:center;color:var(--muted);flex-shrink:0;
+  }
+  .wf-step.trigger .wf-icon{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .wf-step.action .wf-icon{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .wf-step.condition .wf-icon{background:#fff;color:var(--info);border-color:var(--info)}
+  .wf-icon svg{width:14px;height:14px}
+  .wf-step-title{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .wf-step-desc{font-size:11.5px;color:var(--muted);margin-top:3px;font-family:'JetBrains Mono',monospace}
+  .wf-step-meta{font-size:11px;color:var(--dim);margin-top:6px}
+  .wf-footer{
+    padding:12px 18px;border-top:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:11.5px;color:var(--muted);
+  }
+  .wf-footer b{color:var(--ink);font-weight:600;font-family:'JetBrains Mono',monospace}
+
+  /* ============ SETTINGS ============ */
+  .settings-wrap{padding:30px 28px;display:grid;grid-template-columns:200px 1fr;gap:30px;max-width:1100px}
+  .settings-nav{position:sticky;top:88px;align-self:flex-start}
+  .settings-nav .sn-item{
+    display:block;padding:8px 12px;border-radius:6px;font-size:13px;color:var(--muted);
+    cursor:pointer;font-weight:500;
+  }
+  .settings-nav .sn-item:hover{color:var(--ink);background:var(--bg-soft)}
+  .settings-nav .sn-item.active{color:var(--ink);background:var(--bg-soft);font-weight:600}
+  .settings-content{display:flex;flex-direction:column;gap:24px}
+
+  .setting-section{
+    background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  }
+  .setting-section-head{padding:18px 22px;border-bottom:1px solid var(--border)}
+  .setting-section-title{font-family:'Inter',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.015em}
+  .setting-section-desc{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .setting-row{
+    padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:18px;
+    border-bottom:1px solid var(--border);
+  }
+  .setting-row:last-child{border-bottom:none}
+  .setting-row .lbl{font-size:13.5px;font-weight:500;color:var(--ink)}
+  .setting-row .desc{font-size:12px;color:var(--muted);margin-top:2px}
+  .input{
+    padding:8px 12px;border:1px solid var(--border-2);border-radius:7px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink);
+    background:var(--bg-soft);min-width:240px;
+  }
+  .integration{
+    display:flex;align-items:center;gap:14px;padding:14px 22px;
+    border-bottom:1px solid var(--border);
+  }
+  .integration:last-child{border-bottom:none}
+  .int-logo{
+    width:36px;height:36px;border-radius:8px;display:grid;place-items:center;
+    color:#fff;font-weight:700;font-size:13px;flex-shrink:0;font-family:'Inter',sans-serif;
+  }
+  .int-name{font-size:13.5px;font-weight:600}
+  .int-desc{font-size:12px;color:var(--muted);margin-top:2px}
+  .int-status{margin-left:auto;font-size:11.5px;font-weight:600;color:var(--good);display:inline-flex;align-items:center;gap:6px}
+  .int-status.off{color:var(--muted)}
+  .int-status .d{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  .toggle-switch{
+    width:36px;height:20px;background:var(--border-2);border-radius:999px;position:relative;cursor:pointer;
+    transition:.2s;
+  }
+  .toggle-switch::after{
+    content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;
+    transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15);
+  }
+  .toggle-switch.on{background:var(--ink)}
+  .toggle-switch.on::after{left:18px}
+
+  /* ============ VIEW SWITCHING ============ */
+  .view{display:none}
+  .view.active{display:block}
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:1100px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .stat:nth-child(2){border-right:none}
+    .signals-grid{grid-template-columns:1fr}
+    .settings-wrap{grid-template-columns:1fr}
+    .list-head,.row{grid-template-columns:46px minmax(180px,1.2fr) 1.2fr 80px 80px}
+    .col-hide{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ================== SIDEBAR ================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">H</div>
+      <div>
+        <div class="brand-name">Hendon Signals</div>
+        <div class="brand-sub">M&amp;A intelligence</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Workspace</div>
+    <a class="nav-item active" data-view="dashboard">Dashboard <span class="badge">142</span></a>
+    <a class="nav-item" data-view="tam">TAM <span class="badge">24,318</span></a>
+    <a class="nav-item" data-view="signals">Signals <span class="badge">5</span></a>
+    <a class="nav-item" data-view="settings">Settings</a>
+
+    <div class="nav-label">Activity</div>
+    <a class="nav-item" data-view="dashboard">Logs</a>
+
+    <div class="sidebar-bottom">
+      <div class="user">
+        <div class="avatar">VK</div>
+        <div>
+          <div class="user-name">Victor Kapelnikov</div>
+          <div class="user-mail">victor@hendon.io</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================== MAIN ================== -->
+  <main>
+
+    <!-- ============ DASHBOARD VIEW ============ -->
+    <section class="view active" id="view-dashboard">
+
+      <div class="topbar">
+        <div class="crumbs">Workspace / <b>Dashboard</b></div>
+        <div class="topbar-spacer"></div>
+        <div class="top-stat"><span class="pulse"></span> Last cron · <b style="margin-left:4px">12 min ago</b></div>
+        <div class="top-stat" style="margin-left:18px">Next run in <b style="margin-left:4px">6d 11h</b></div>
+      </div>
+
+      <div class="header">
+        <div>
+          <div class="h-eyebrow">Cycle 47 · this week</div>
+          <h1 class="h-title">Surfaced opportunities.</h1>
+          <div class="h-sub">Companies the agentic monitor flagged this cycle, ranked by signal density. Export the full list with enrichment to take into outreach.</div>
+        </div>
+        <div class="h-actions">
+          <button class="btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+            Filters
+          </button>
+          <button class="btn-primary btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">New signals · this week</div>
+          <div class="stat-value">142</div>
+          <div class="stat-delta">▲ 38 vs. last week</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Companies surfaced</div>
+          <div class="stat-value">87</div>
+          <div class="stat-delta">▲ 12 new</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">TAM scanned</div>
+          <div class="stat-value">8,104<span class="sm">/ 24,318</span></div>
+          <div class="stat-delta dim">rolling 3-month cycle</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Cost · this month</div>
+          <div class="stat-value">$214</div>
+          <div class="stat-delta">vs. ~$1,800 in Clay</div>
+        </div>
+      </div>
+
+      <div class="note-banner">
+        <span class="tag">CYCLE</span>
+        Agentic monitor processed 1,247 home care agencies overnight. 23 fresh signals across 4 active rules.
+      </div>
+
+      <div class="toolbar">
+        <div class="search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <input placeholder="Search company, owner, location…" />
+        </div>
+        <div class="filter active">Signal: <b>All 4</b></div>
+        <div class="filter">Category: <b>Any</b></div>
+        <div class="filter">State: <b>Any</b></div>
+        <div class="filter">Min signals: <b>1+</b></div>
+        <div class="sort">Sort by <b style="color:var(--ink);font-weight:600;margin-left:2px">Signal count ↓</b></div>
+      </div>
+
+      <div class="list-head">
+        <div></div>
+        <div>Company</div>
+        <div>Active signals</div>
+        <div class="col-hide">Category</div>
+        <div class="col-hide">Last seen</div>
+        <div>Signals</div>
+        <div class="right">Actions</div>
+      </div>
+
+      <div class="row hot">
+        <div class="logo l1">SC</div>
+        <div>
+          <div class="co-name">Sunrise Care of Tampa</div>
+          <div class="co-url">sunrisecaretampa.com <span class="ext">↗</span> · Tampa, FL</div>
+        </div>
+        <div class="signals">
+          <div class="signal-tag"><span class="sd sd-hot"></span> Owner age 68 <span class="sv">linkedin</span></div>
+          <div class="signal-tag"><span class="sd sd-warm"></span> Ad volume ▼ 64% <span class="sv">meta · 30d</span></div>
+          <div class="signal-tag"><span class="sd sd-info"></span> Nearby Hendon close <span class="sv">2.4 mi</span></div>
+        </div>
+        <div class="meta-cell col-hide"><b>Medicare</b><br/><span class="mono">+ private pay</span></div>
+        <div class="meta-cell col-hide"><b>2 hrs ago</b><br/><span class="mono">cycle 47</span></div>
+        <div><div class="count-pill"><b>4</b><span>signals</span></div></div>
+        <div class="row-action">
+          <div class="icon-btn" title="Open in HubSpot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7M10 14L21 3M5 7v12a2 2 0 002 2h12"/></svg></div>
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        </div>
+      </div>
+
+      <div class="row hot">
+        <div class="logo l2">CG</div>
+        <div>
+          <div class="co-name">Comfort Grove Home Health</div>
+          <div class="co-url">comfortgrove.io <span class="ext">↗</span> · Charlotte, NC</div>
+        </div>
+        <div class="signals">
+          <div class="signal-tag"><span class="sd sd-info"></span> Nearby Hendon close <span class="sv">3.1 mi</span></div>
+          <div class="signal-tag"><span class="sd sd-warm"></span> 0 ads, was 14/mo <span class="sv">google</span></div>
+          <div class="signal-tag"><span class="sd sd-hot"></span> Owner age 71 <span class="sv">linkedin</span></div>
+        </div>
+        <div class="meta-cell col-hide"><b>Medicaid</b><br/><span class="mono">+ medicare</span></div>
+        <div class="meta-cell col-hide"><b>5 hrs ago</b><br/><span class="mono">cycle 47</span></div>
+        <div><div class="count-pill"><b>3</b><span>signals</span></div></div>
+        <div class="row-action">
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7M10 14L21 3M5 7v12a2 2 0 002 2h12"/></svg></div>
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        </div>
+      </div>
+
+      <div class="row warm">
+        <div class="logo l3">BL</div>
+        <div>
+          <div class="co-name">Brightleaf Senior Services</div>
+          <div class="co-url">brightleafsenior.com <span class="ext">↗</span> · Raleigh, NC</div>
+        </div>
+        <div class="signals">
+          <div class="signal-tag"><span class="sd sd-warm"></span> Ad spend ▲ 240% <span class="sv">meta</span></div>
+          <div class="signal-tag"><span class="sd sd-good"></span> Reviews ▲ 4.7→4.9 <span class="sv">google</span></div>
+        </div>
+        <div class="meta-cell col-hide"><b>Private pay</b><br/><span class="mono">premium</span></div>
+        <div class="meta-cell col-hide"><b>1 day ago</b><br/><span class="mono">cycle 46</span></div>
+        <div><div class="count-pill"><b>2</b><span>signals</span></div></div>
+        <div class="row-action">
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7M10 14L21 3M5 7v12a2 2 0 002 2h12"/></svg></div>
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        </div>
+      </div>
+
+      <div class="row hot">
+        <div class="logo l4">EH</div>
+        <div>
+          <div class="co-name">Evergreen Home Helpers</div>
+          <div class="co-url">evergreenhh.com <span class="ext">↗</span> · Phoenix, AZ</div>
+        </div>
+        <div class="signals">
+          <div class="signal-tag"><span class="sd sd-hot"></span> Owner age 73 <span class="sv">linkedin</span></div>
+          <div class="signal-tag"><span class="sd sd-warm"></span> Ads ▼ 100% <span class="sv">meta · 60d</span></div>
+          <div class="signal-tag"><span class="sd sd-warm"></span> Site stale 90+ days <span class="sv">apify</span></div>
+          <div class="signal-tag"><span class="sd sd-info"></span> Nearby Hendon close <span class="sv">4.8 mi</span></div>
+        </div>
+        <div class="meta-cell col-hide"><b>Medicare</b><br/><span class="mono">family-owned</span></div>
+        <div class="meta-cell col-hide"><b>1 day ago</b><br/><span class="mono">cycle 46</span></div>
+        <div><div class="count-pill"><b>4</b><span>signals</span></div></div>
+        <div class="row-action">
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7M10 14L21 3M5 7v12a2 2 0 002 2h12"/></svg></div>
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        </div>
+      </div>
+
+      <div class="row warm">
+        <div class="logo l5">QC</div>
+        <div>
+          <div class="co-name">Quiet Creek Home Care</div>
+          <div class="co-url">quietcreekcare.com <span class="ext">↗</span> · Austin, TX</div>
+        </div>
+        <div class="signals">
+          <div class="signal-tag"><span class="sd sd-warm"></span> Ads ▼ 48% <span class="sv">google</span></div>
+          <div class="signal-tag"><span class="sd sd-good"></span> Hiring caregivers <span class="sv">linkedin · 6 jobs</span></div>
+        </div>
+        <div class="meta-cell col-hide"><b>Medicaid</b></div>
+        <div class="meta-cell col-hide"><b>2 days ago</b><br/><span class="mono">cycle 46</span></div>
+        <div><div class="count-pill"><b>2</b><span>signals</span></div></div>
+        <div class="row-action">
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7M10 14L21 3M5 7v12a2 2 0 002 2h12"/></svg></div>
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        </div>
+      </div>
+
+      <div class="row hot">
+        <div class="logo l7">RP</div>
+        <div>
+          <div class="co-name">Riverpoint Home Health Inc.</div>
+          <div class="co-url">riverpointhealth.com <span class="ext">↗</span> · Columbus, OH</div>
+        </div>
+        <div class="signals">
+          <div class="signal-tag"><span class="sd sd-hot"></span> Owner age 69 <span class="sv">linkedin</span></div>
+          <div class="signal-tag"><span class="sd sd-warm"></span> Ads ▼ 88% <span class="sv">meta · 90d</span></div>
+          <div class="signal-tag"><span class="sd sd-info"></span> Nearby Hendon close <span class="sv">1.9 mi</span></div>
+        </div>
+        <div class="meta-cell col-hide"><b>Medicare</b></div>
+        <div class="meta-cell col-hide"><b>3 days ago</b><br/><span class="mono">cycle 46</span></div>
+        <div><div class="count-pill"><b>3</b><span>signals</span></div></div>
+        <div class="row-action">
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7M10 14L21 3M5 7v12a2 2 0 002 2h12"/></svg></div>
+          <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        </div>
+      </div>
+
+      <div class="pager">
+        <div>Showing <b style="color:var(--ink)">1–6</b> of <b style="color:var(--ink)">87</b> companies · <span class="chip">142 signals</span></div>
+        <div class="controls">
+          <div class="page-btn">‹</div>
+          <div class="page-btn active">1</div>
+          <div class="page-btn">2</div>
+          <div class="page-btn">3</div>
+          <div class="page-btn">…</div>
+          <div class="page-btn">15</div>
+          <div class="page-btn">›</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TAM VIEW ============ -->
+    <section class="view" id="view-tam">
+
+      <div class="topbar">
+        <div class="crumbs">Workspace / <b>TAM</b></div>
+        <div class="topbar-spacer"></div>
+        <div class="top-stat">Enrichment queue · <b style="margin-left:4px">214 pending</b></div>
+        <div class="top-stat" style="margin-left:18px"><span class="pulse"></span> Auto-enriching</div>
+      </div>
+
+      <div class="header">
+        <div>
+          <div class="h-eyebrow">Total Addressable Market</div>
+          <h1 class="h-title">All companies tracked.</h1>
+          <div class="h-sub">Upload a CSV with name and URL. Duplicates are dropped automatically. Enrichment runs in the background — LinkedIn, Google Maps, ad volume, ownership.</div>
+        </div>
+        <div class="h-actions">
+          <button class="btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+            Export
+          </button>
+          <button class="btn-primary btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v18m-9-9h18"/></svg>
+            Upload CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Companies in TAM</div>
+          <div class="stat-value">24,318</div>
+          <div class="stat-delta">▲ 1,204 this month</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Fully enriched</div>
+          <div class="stat-value">22,847<span class="sm">94%</span></div>
+          <div class="stat-delta">▲ 312 today</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">In enrichment queue</div>
+          <div class="stat-value">214</div>
+          <div class="stat-delta dim">est. 38 min remaining</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Failed enrichment</div>
+          <div class="stat-value">112</div>
+          <div class="stat-delta warn">▲ retry available</div>
+        </div>
+      </div>
+
+      <div class="tam-toolbar">
+        <div class="search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <input placeholder="Search 24,318 companies…" />
+        </div>
+        <div class="pill">Selected: <b>0</b></div>
+        <div class="pill">Filter: <b>All</b></div>
+        <div class="pill">Columns: <b>14</b></div>
+        <div style="margin-left:auto" class="pill mono"><b>5,047</b> rows / page</div>
+      </div>
+
+      <div class="sheet">
+        <table class="tam">
+          <thead>
+            <tr>
+              <th class="num">#</th>
+              <th class="check"><input type="checkbox" /></th>
+              <th>Company</th>
+              <th>URL</th>
+              <th>State</th>
+              <th>Category</th>
+              <th>LinkedIn</th>
+              <th>Owner</th>
+              <th>Owner age</th>
+              <th>Reviews</th>
+              <th>Ad volume</th>
+              <th>Last enriched</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="num">1</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Sunrise Care of Tampa</td>
+              <td class="url">sunrisecaretampa.com</td>
+              <td>FL</td>
+              <td><span class="tag medicare">Medicare</span></td>
+              <td class="url">/company/sunrise-care</td>
+              <td>Robert Hayes</td>
+              <td>68</td>
+              <td>4.6 ★ (214)</td>
+              <td>4 / 30d</td>
+              <td>2h ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+            <tr>
+              <td class="num">2</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Comfort Grove Home Health</td>
+              <td class="url">comfortgrove.io</td>
+              <td>NC</td>
+              <td><span class="tag medicaid">Medicaid</span></td>
+              <td class="url">/company/comfort-grove</td>
+              <td>Diane Whitaker</td>
+              <td>71</td>
+              <td>4.4 ★ (98)</td>
+              <td>0 / 30d</td>
+              <td>5h ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+            <tr>
+              <td class="num">3</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Brightleaf Senior Services</td>
+              <td class="url">brightleafsenior.com</td>
+              <td>NC</td>
+              <td><span class="tag private">Private pay</span></td>
+              <td class="url">/company/brightleaf</td>
+              <td>Marcus Lee</td>
+              <td>52</td>
+              <td>4.9 ★ (340)</td>
+              <td>17 / 30d</td>
+              <td>1d ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+            <tr>
+              <td class="num">4</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Evergreen Home Helpers</td>
+              <td class="url">evergreenhh.com</td>
+              <td>AZ</td>
+              <td><span class="tag medicare">Medicare</span></td>
+              <td class="url">/company/evergreen</td>
+              <td>Linda Park</td>
+              <td>73</td>
+              <td>4.2 ★ (167)</td>
+              <td>0 / 60d</td>
+              <td>1d ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+            <tr>
+              <td class="num">5</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Quiet Creek Home Care</td>
+              <td class="url">quietcreekcare.com</td>
+              <td>TX</td>
+              <td><span class="tag medicaid">Medicaid</span></td>
+              <td class="url">/company/quiet-creek</td>
+              <td>Anita Brooks</td>
+              <td>57</td>
+              <td>4.5 ★ (89)</td>
+              <td>3 / 30d</td>
+              <td>2d ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+            <tr>
+              <td class="num">6</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Magnolia Manor Caregivers</td>
+              <td class="url">magnoliamanor.health</td>
+              <td>GA</td>
+              <td><span class="tag private">Private pay</span></td>
+              <td class="url">/company/magnolia-manor</td>
+              <td>James Whitman</td>
+              <td>64</td>
+              <td>4.8 ★ (412)</td>
+              <td>9 / 30d</td>
+              <td>3d ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+            <tr>
+              <td class="num">7</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Riverpoint Home Health Inc.</td>
+              <td class="url">riverpointhealth.com</td>
+              <td>OH</td>
+              <td><span class="tag medicare">Medicare</span></td>
+              <td class="url">/company/riverpoint</td>
+              <td>George Tan</td>
+              <td>69</td>
+              <td>4.3 ★ (203)</td>
+              <td>1 / 90d</td>
+              <td>3d ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+            <tr>
+              <td class="num">8</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Cedar Hollow Senior Care</td>
+              <td class="url">cedarhollow.us</td>
+              <td>OR</td>
+              <td><span class="tag medicaid">Medicaid</span></td>
+              <td class="url">/company/cedar-hollow</td>
+              <td>Wendy Ortiz</td>
+              <td>59</td>
+              <td>3.9 ★ (76)</td>
+              <td>2 / 30d</td>
+              <td>4d ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+            <tr>
+              <td class="num">9</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Harbor Light Home Care</td>
+              <td class="url">harborlighthc.com</td>
+              <td>WA</td>
+              <td><span class="tag medicare">Medicare</span></td>
+              <td class="url">/company/harbor-light</td>
+              <td>Dean Whitfield</td>
+              <td>61</td>
+              <td>4.7 ★ (188)</td>
+              <td>6 / 30d</td>
+              <td>4d ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+            <tr>
+              <td class="num">10</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Stonebrook Family Home Care</td>
+              <td class="url">stonebrookfhc.com</td>
+              <td>VA</td>
+              <td><span class="tag medicaid">Medicaid</span></td>
+              <td class="url empty">enriching…</td>
+              <td class="empty">—</td>
+              <td class="empty">—</td>
+              <td class="empty">—</td>
+              <td class="empty">—</td>
+              <td>just now</td>
+              <td><span class="dot-cell"><span class="d d-pending"></span> Enriching</span></td>
+            </tr>
+            <tr>
+              <td class="num">11</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Wildflower Care Group</td>
+              <td class="url">wildflowercare.co</td>
+              <td>CO</td>
+              <td><span class="tag private">Private pay</span></td>
+              <td class="url empty">queued</td>
+              <td class="empty">—</td>
+              <td class="empty">—</td>
+              <td class="empty">—</td>
+              <td class="empty">—</td>
+              <td class="empty">—</td>
+              <td><span class="dot-cell"><span class="d d-pending"></span> Queued</span></td>
+            </tr>
+            <tr>
+              <td class="num">12</td><td class="check"><input type="checkbox" /></td>
+              <td class="name">Linden Glen Home Health</td>
+              <td class="url">lindenglen.health</td>
+              <td>NJ</td>
+              <td><span class="tag medicare">Medicare</span></td>
+              <td class="url">/company/linden-glen</td>
+              <td>Patricia Vega</td>
+              <td>66</td>
+              <td>4.5 ★ (122)</td>
+              <td>2 / 60d</td>
+              <td>5d ago</td>
+              <td><span class="dot-cell"><span class="d d-good"></span> Enriched</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pager">
+        <div>Rows <b style="color:var(--ink)">1–12</b> of <b style="color:var(--ink)">24,318</b> · <span class="chip">94% enriched</span></div>
+        <div class="controls">
+          <div class="page-btn">‹</div>
+          <div class="page-btn active">1</div>
+          <div class="page-btn">2</div>
+          <div class="page-btn">3</div>
+          <div class="page-btn">…</div>
+          <div class="page-btn">487</div>
+          <div class="page-btn">›</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SIGNALS VIEW ============ -->
+    <section class="view" id="view-signals">
+
+      <div class="topbar">
+        <div class="crumbs">Workspace / <b>Signals</b></div>
+        <div class="topbar-spacer"></div>
+        <div class="top-stat">4 of 5 active · <b style="margin-left:4px">running on cron</b></div>
+      </div>
+
+      <div class="header">
+        <div>
+          <div class="h-eyebrow">Workflow rules</div>
+          <h1 class="h-title">Signal definitions.</h1>
+          <div class="h-sub">Each signal is a workflow that runs on its own schedule. Trigger → Source → Condition → Output. Edit the blocks; the cron handles the rest.</div>
+        </div>
+        <div class="h-actions">
+          <button class="btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v8m-4-4h8"/></svg>
+            Test signal
+          </button>
+          <button class="btn-primary btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v18m-9-9h18"/></svg>
+            New signal
+          </button>
+        </div>
+      </div>
+
+      <div class="signals-grid">
+
+        <!-- SIGNAL 1: Owner age -->
+        <div class="workflow-card">
+          <div class="wf-header">
+            <div>
+              <div class="wf-name">Owner over 65</div>
+              <div class="wf-desc">LinkedIn-derived owner age threshold</div>
+            </div>
+            <div class="wf-toggle"><span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span> Active</div>
+          </div>
+          <div class="wf-blocks">
+            <div class="wf-step trigger">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+              <div>
+                <div class="wf-step-title">Trigger</div>
+                <div class="wf-step-desc">cron · every Monday 06:00 UTC</div>
+                <div class="wf-step-meta">Walks 8,000 companies per cycle</div>
+              </div>
+            </div>
+            <div class="wf-step">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div>
+              <div>
+                <div class="wf-step-title">Source</div>
+                <div class="wf-step-desc">Apify · LinkedIn profile scrape</div>
+                <div class="wf-step-meta">Fields: founded_year, role_start, profile_age</div>
+              </div>
+            </div>
+            <div class="wf-step condition">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h6l3-6 3 12 3-6h3"/></svg></div>
+              <div>
+                <div class="wf-step-title">Condition</div>
+                <div class="wf-step-desc">owner_age &gt;= 65</div>
+                <div class="wf-step-meta">Estimate from grad year + profile metadata</div>
+              </div>
+            </div>
+            <div class="wf-step action">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+              <div>
+                <div class="wf-step-title">Output</div>
+                <div class="wf-step-desc">push to dashboard · tag: hot</div>
+                <div class="wf-step-meta">Re-fires monthly even if same company</div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-footer">
+            <div>Last run · <b>2h ago</b></div>
+            <div>Generated · <b>47</b> signals</div>
+          </div>
+        </div>
+
+        <!-- SIGNAL 2: Ad volume -->
+        <div class="workflow-card">
+          <div class="wf-header">
+            <div>
+              <div class="wf-name">Ad volume drop</div>
+              <div class="wf-desc">Monthly ad activity comparison</div>
+            </div>
+            <div class="wf-toggle"><span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span> Active</div>
+          </div>
+          <div class="wf-blocks">
+            <div class="wf-step trigger">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+              <div>
+                <div class="wf-step-title">Trigger</div>
+                <div class="wf-step-desc">cron · 1st of every month, 03:00 UTC</div>
+              </div>
+            </div>
+            <div class="wf-step">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></div>
+              <div>
+                <div class="wf-step-title">Source</div>
+                <div class="wf-step-desc">Meta Ad Library + Google Ads Library</div>
+                <div class="wf-step-meta">Returns: active_ad_count, spend_estimate</div>
+              </div>
+            </div>
+            <div class="wf-step condition">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h6l3-6 3 12 3-6h3"/></svg></div>
+              <div>
+                <div class="wf-step-title">Condition</div>
+                <div class="wf-step-desc">delta(prev_month, this_month) &lt;= -40%</div>
+                <div class="wf-step-meta">Replaces previous record on each run</div>
+              </div>
+            </div>
+            <div class="wf-step action">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+              <div>
+                <div class="wf-step-title">Output</div>
+                <div class="wf-step-desc">push to dashboard · tag: warm</div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-footer">
+            <div>Last run · <b>4d ago</b></div>
+            <div>Generated · <b>61</b> signals</div>
+          </div>
+        </div>
+
+        <!-- SIGNAL 3: Nearby Hendon close -->
+        <div class="workflow-card">
+          <div class="wf-header">
+            <div>
+              <div class="wf-name">Nearby Hendon close</div>
+              <div class="wf-desc">Trigger on HubSpot deal-won within 50 mi radius</div>
+            </div>
+            <div class="wf-toggle"><span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span> Active</div>
+          </div>
+          <div class="wf-blocks">
+            <div class="wf-step trigger">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h6l3-6 3 12 3-6h3"/></svg></div>
+              <div>
+                <div class="wf-step-title">Trigger</div>
+                <div class="wf-step-desc">HubSpot · deal.stage == "closed_won"</div>
+                <div class="wf-step-meta">Polls every 6h for new closed deals</div>
+              </div>
+            </div>
+            <div class="wf-step">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 6 8 12 8 12s8-6 8-12a8 8 0 00-8-8z"/></svg></div>
+              <div>
+                <div class="wf-step-title">Source</div>
+                <div class="wf-step-desc">Geocode deal address (Google Maps)</div>
+              </div>
+            </div>
+            <div class="wf-step condition">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h6l3-6 3 12 3-6h3"/></svg></div>
+              <div>
+                <div class="wf-step-title">Condition</div>
+                <div class="wf-step-desc">distance(tam_company, closed_deal) &lt;= 50 mi</div>
+                <div class="wf-step-meta">Editable: 25 mi · 50 mi · 100 mi</div>
+              </div>
+            </div>
+            <div class="wf-step action">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+              <div>
+                <div class="wf-step-title">Output</div>
+                <div class="wf-step-desc">push to dashboard · tag: info</div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-footer">
+            <div>Last run · <b>22h ago</b></div>
+            <div>Generated · <b>23</b> signals</div>
+          </div>
+        </div>
+
+        <!-- SIGNAL 4: Reviews -->
+        <div class="workflow-card">
+          <div class="wf-header">
+            <div>
+              <div class="wf-name">Review velocity</div>
+              <div class="wf-desc">Google review trend monitor</div>
+            </div>
+            <div class="wf-toggle"><span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span> Active</div>
+          </div>
+          <div class="wf-blocks">
+            <div class="wf-step trigger">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+              <div>
+                <div class="wf-step-title">Trigger</div>
+                <div class="wf-step-desc">cron · every Wednesday 04:00 UTC</div>
+              </div>
+            </div>
+            <div class="wf-step">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg></div>
+              <div>
+                <div class="wf-step-title">Source</div>
+                <div class="wf-step-desc">Serper · Google Maps reviews</div>
+              </div>
+            </div>
+            <div class="wf-step condition">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h6l3-6 3 12 3-6h3"/></svg></div>
+              <div>
+                <div class="wf-step-title">Condition</div>
+                <div class="wf-step-desc">avg_delta &gt;= +0.2 OR review_count_30d &gt;= 10</div>
+              </div>
+            </div>
+            <div class="wf-step action">
+              <div class="wf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+              <div>
+                <div class="wf-step-title">Output</div>
+                <div class="wf-step-desc">push to dashboard · tag: good</div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-footer">
+            <div>Last run · <b>2d ago</b></div>
+            <div>Generated · <b>11</b> signals</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS VIEW ============ -->
+    <section class="view" id="view-settings">
+
+      <div class="topbar">
+        <div class="crumbs">Workspace / <b>Settings</b></div>
+        <div class="topbar-spacer"></div>
+        <div class="top-stat">Hendon Partners · <b style="margin-left:4px">Pro plan</b></div>
+      </div>
+
+      <div class="header">
+        <div>
+          <div class="h-eyebrow">Account &amp; configuration</div>
+          <h1 class="h-title">Settings.</h1>
+          <div class="h-sub">Connect data sources, manage integrations, set enrichment defaults, and control who sees what.</div>
+        </div>
+      </div>
+
+      <div class="settings-wrap">
+
+        <nav class="settings-nav">
+          <div class="sn-item active">Workspace</div>
+          <div class="sn-item">Integrations</div>
+          <div class="sn-item">Enrichment</div>
+          <div class="sn-item">Data sources</div>
+          <div class="sn-item">Schedule &amp; cron</div>
+          <div class="sn-item">Notifications</div>
+          <div class="sn-item">Team</div>
+          <div class="sn-item">Billing</div>
+        </nav>
+
+        <div class="settings-content">
+
+          <div class="setting-section">
+            <div class="setting-section-head">
+              <div class="setting-section-title">Workspace</div>
+              <div class="setting-section-desc">Basic info shown across the app.</div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Workspace name</div>
+                <div class="desc">Visible in the sidebar and on exports</div>
+              </div>
+              <input class="input" value="Hendon Partners" />
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Default time zone</div>
+                <div class="desc">Affects cron schedules and timestamps</div>
+              </div>
+              <input class="input" value="America/New_York" />
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Slack webhook</div>
+                <div class="desc">New signals can ping a channel</div>
+              </div>
+              <input class="input" value="https://hooks.slack.com/T0***/B0***" />
+            </div>
+          </div>
+
+          <div class="setting-section">
+            <div class="setting-section-head">
+              <div class="setting-section-title">Integrations</div>
+              <div class="setting-section-desc">Connect HubSpot, source APIs, and exports.</div>
+            </div>
+            <div class="integration">
+              <div class="int-logo" style="background:#ff5c2c">H</div>
+              <div>
+                <div class="int-name">HubSpot</div>
+                <div class="int-desc">CRM · powers "Nearby Hendon close" signal · polls deal pipeline</div>
+              </div>
+              <div class="int-status"><span class="d"></span> Connected</div>
+            </div>
+            <div class="integration">
+              <div class="int-logo" style="background:#1f6147">A</div>
+              <div>
+                <div class="int-name">Apify</div>
+                <div class="int-desc">LinkedIn, Google Ads, ad library scrapers · 1 API key</div>
+              </div>
+              <div class="int-status"><span class="d"></span> Connected</div>
+            </div>
+            <div class="integration">
+              <div class="int-logo" style="background:#3a5dd6">S</div>
+              <div>
+                <div class="int-name">Serper</div>
+                <div class="int-desc">Google search + Google Maps reviews</div>
+              </div>
+              <div class="int-status"><span class="d"></span> Connected</div>
+            </div>
+            <div class="integration">
+              <div class="int-logo" style="background:#0a0a0a">Z</div>
+              <div>
+                <div class="int-name">Zenrows</div>
+                <div class="int-desc">Browser-based scraping · website enrichment</div>
+              </div>
+              <div class="int-status"><span class="d"></span> Connected</div>
+            </div>
+            <div class="integration">
+              <div class="int-logo" style="background:#34a853">G</div>
+              <div>
+                <div class="int-name">Google Sheets</div>
+                <div class="int-desc">Daily signal drop · destination spreadsheet</div>
+              </div>
+              <div class="int-status off"><span class="d"></span> Not connected</div>
+            </div>
+          </div>
+
+          <div class="setting-section">
+            <div class="setting-section-head">
+              <div class="setting-section-title">Enrichment defaults</div>
+              <div class="setting-section-desc">What gets pulled when a new company is added to TAM.</div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">LinkedIn company profile</div>
+                <div class="desc">Logo, founded year, employees, owner identification</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Google Maps location &amp; reviews</div>
+                <div class="desc">Address, rating, review count, hours</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Ad library scan (Meta + Google)</div>
+                <div class="desc">Active ads, monthly volume, spend estimate</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Website scrape (Zenrows)</div>
+                <div class="desc">About page, services offered, last-modified header</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Owner age estimation</div>
+                <div class="desc">Derive from LinkedIn grad year + role tenure</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+
+          <div class="setting-section">
+            <div class="setting-section-head">
+              <div class="setting-section-title">Schedule &amp; cron</div>
+              <div class="setting-section-desc">When the agentic monitor walks the TAM.</div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Rolling cycle length</div>
+                <div class="desc">How often each company is re-checked</div>
+              </div>
+              <input class="input" value="3 months" />
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Daily batch size</div>
+                <div class="desc">How many companies to process per cron tick</div>
+              </div>
+              <input class="input" value="800 / day" />
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="lbl">Cycle timezone</div>
+                <div class="desc">Crons run in this time zone</div>
+              </div>
+              <input class="input" value="UTC" />
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // simple sidebar nav switcher
+  const items = document.querySelectorAll('.nav-item[data-view]');
+  const views = document.querySelectorAll('.view');
+  items.forEach(it => {
+    it.addEventListener('click', e => {
+      e.preventDefault();
+      const target = it.dataset.view;
+      items.forEach(x => x.classList.toggle('active', x.dataset.view === target));
+      views.forEach(v => v.classList.toggle('active', v.id === 'view-' + target));
+      window.scrollTo({top:0, behavior:'instant'});
+    });
+  });
+</script>
+
+</body>
+</html>
