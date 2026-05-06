@@ -1,0 +1,373 @@
+<header class="mb-8">
+  <p class="text-xs font-medium uppercase tracking-wider text-slate-500">
+    Hendon Signal Agent · Admin
+  </p>
+  <h1 class="mt-1 text-2xl font-semibold text-ink">Settings</h1>
+  <p class="mt-2 max-w-2xl text-sm text-slate-600">
+    Toggle signals, weights, ICP rules, and output channels. Each section saves
+    independently. Run <code class="rounded bg-slate-100 px-1 text-xs">npm run classify</code>
+    after rule changes to apply them to today's drop.
+  </p>
+</header>
+
+<!-- 01. Signals -->
+<section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <form>
+    <div class="flex items-baseline gap-3">
+      <span class="font-mono text-xs text-slate-400">01.</span>
+      <h2 class="text-sm font-semibold text-ink">Signals</h2>
+    </div>
+    <p class="mt-1 ml-7 text-xs text-slate-500">
+      Turn each signal type on or off. Disabled signals are skipped by
+      <code class="rounded bg-slate-100 px-1 text-xs">npm run generate-signals</code>.
+    </p>
+
+    <div class="mt-4 ml-7 space-y-3">
+      {{SIGNALS_TOGGLES}}
+    </div>
+
+    <div class="mt-6 ml-7 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        hx-post="/admin/settings/save?section=1"
+        hx-target="#save-pill-1"
+        hx-swap="innerHTML"
+        hx-include="closest form"
+        class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
+      >
+        Save signals
+      </button>
+      <span id="save-pill-1" class="text-xs"></span>
+    </div>
+  </form>
+</section>
+
+<!-- 02. Tier rules -->
+<section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <form>
+    <div class="flex items-baseline gap-3">
+      <span class="font-mono text-xs text-slate-400">02.</span>
+      <h2 class="text-sm font-semibold text-ink">Tier rules</h2>
+    </div>
+    <p class="mt-1 ml-7 text-xs text-slate-500">
+      Per-signal weights and tier thresholds. Score = Σ(strength × weight) per
+      agency. Re-run <code class="rounded bg-slate-100 px-1 text-xs">npm run classify</code>
+      to apply changes.
+    </p>
+
+    <div class="mt-4 ml-7">
+      <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Weights</p>
+      <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {{TIER_WEIGHT_INPUTS}}
+      </div>
+    </div>
+
+    <div class="mt-5 ml-7">
+      <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Thresholds</p>
+      <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {{TIER_THRESHOLD_INPUTS}}
+      </div>
+    </div>
+
+    <div class="mt-6 ml-7 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        hx-post="/admin/settings/save?section=2"
+        hx-target="#save-pill-2"
+        hx-swap="innerHTML"
+        hx-include="closest form"
+        class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
+      >
+        Save tier rules
+      </button>
+      <span id="save-pill-2" class="text-xs"></span>
+    </div>
+  </form>
+</section>
+
+<!-- 03. Dedup -->
+<section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <form>
+    <div class="flex items-baseline gap-3">
+      <span class="font-mono text-xs text-slate-400">03.</span>
+      <h2 class="text-sm font-semibold text-ink">Dedup &amp; cooldown</h2>
+    </div>
+    <p class="mt-1 ml-7 text-xs text-slate-500">
+      How long after a surface a lead is suppressed. The long-term floor
+      guarantees a re-surface for sleepy agencies regardless of cooldown.
+    </p>
+
+    <div class="mt-4 ml-7 space-y-4">
+      <div>
+        <label for="dedup_window_days" class="block text-sm font-medium text-ink">
+          Cooldown window (days)
+        </label>
+        <input
+          type="number"
+          id="dedup_window_days"
+          name="dedup_window_days"
+          value="{{DEDUP_WINDOW_DAYS}}"
+          min="0"
+          max="365"
+          step="1"
+          class="mt-2 block w-32 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40"
+        />
+      </div>
+
+      <div class="flex items-center gap-3">
+        <label class="relative inline-flex cursor-pointer items-center">
+          <input type="checkbox" name="dedup_long_term_floor_enabled" value="1" {{DEDUP_LONG_TERM_FLOOR_ENABLED_CHECKED}} class="peer sr-only">
+          <div class="peer h-6 w-11 rounded-full bg-slate-200 peer-checked:bg-brand after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+        </label>
+        <span class="text-sm text-ink">Enable 6-month floor</span>
+      </div>
+
+      <div>
+        <label for="dedup_long_term_floor_days" class="block text-sm font-medium text-ink">
+          Long-term floor (days)
+        </label>
+        <input
+          type="number"
+          id="dedup_long_term_floor_days"
+          name="dedup_long_term_floor_days"
+          value="{{DEDUP_LONG_TERM_FLOOR_DAYS}}"
+          min="0"
+          max="730"
+          step="1"
+          class="mt-2 block w-32 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40"
+        />
+      </div>
+    </div>
+
+    <div class="mt-6 ml-7 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        hx-post="/admin/settings/save?section=3"
+        hx-target="#save-pill-3"
+        hx-swap="innerHTML"
+        hx-include="closest form"
+        class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
+      >
+        Save dedup
+      </button>
+      <span id="save-pill-3" class="text-xs"></span>
+    </div>
+  </form>
+</section>
+
+<!-- 04. ICP rules -->
+<section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <form>
+    <div class="flex items-baseline gap-3">
+      <span class="font-mono text-xs text-slate-400">04.</span>
+      <h2 class="text-sm font-semibold text-ink">ICP rules</h2>
+    </div>
+    <p class="mt-1 ml-7 text-xs text-slate-500">
+      Which license types are in-scope, and which service types qualify a lead
+      as ICP. Unchecking a service type moves it to the excluded list.
+    </p>
+
+    <div class="mt-4 ml-7">
+      <p class="text-xs font-medium uppercase tracking-wider text-slate-500">License types</p>
+      <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {{ICP_LICENSE_CHECKBOXES}}
+      </div>
+    </div>
+
+    <div class="mt-5 ml-7">
+      <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Service types</p>
+      <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {{ICP_SERVICE_CHECKBOXES}}
+      </div>
+    </div>
+
+    <div class="mt-6 ml-7 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        hx-post="/admin/settings/save?section=4"
+        hx-target="#save-pill-4"
+        hx-swap="innerHTML"
+        hx-include="closest form"
+        class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
+      >
+        Save ICP rules
+      </button>
+      <span id="save-pill-4" class="text-xs"></span>
+    </div>
+  </form>
+</section>
+
+<!-- 05. Priority states -->
+<section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <form>
+    <div class="flex items-baseline gap-3">
+      <span class="font-mono text-xs text-slate-400">05.</span>
+      <h2 class="text-sm font-semibold text-ink">Priority states</h2>
+    </div>
+    <p class="mt-1 ml-7 text-xs text-slate-500">
+      Medicare/mixed-license agencies in these states are promoted to secondary
+      ICP. Agencies elsewhere become pending review.
+    </p>
+
+    <div class="mt-4 ml-7 grid grid-cols-3 gap-2 sm:grid-cols-6">
+      {{PRIORITY_STATE_CHECKBOXES}}
+    </div>
+
+    <div class="mt-6 ml-7 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        hx-post="/admin/settings/save?section=5"
+        hx-target="#save-pill-5"
+        hx-swap="innerHTML"
+        hx-include="closest form"
+        class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
+      >
+        Save priority states
+      </button>
+      <span id="save-pill-5" class="text-xs"></span>
+    </div>
+  </form>
+</section>
+
+<!-- 06. Lead quotas -->
+<section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <form>
+    <div class="flex items-baseline gap-3">
+      <span class="font-mono text-xs text-slate-400">06.</span>
+      <h2 class="text-sm font-semibold text-ink">Lead quotas</h2>
+    </div>
+    <p class="mt-1 ml-7 text-xs text-slate-500">
+      Max leads classified per day per filter. The
+      <a href="/admin/quota" class="font-medium text-brand hover:text-brand-dark">/admin/quota</a>
+      page has live cost ranges.
+    </p>
+
+    <div class="mt-4 ml-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div>
+        <label for="quota_icp_per_day" class="block text-sm font-medium text-ink">
+          ICP filter — leads / day
+        </label>
+        <input
+          type="number"
+          id="quota_icp_per_day"
+          name="quota_icp_per_day"
+          value="{{QUOTA_ICP_PER_DAY}}"
+          min="0"
+          max="50000"
+          step="1"
+          class="mt-2 block w-32 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40"
+        />
+      </div>
+      <div>
+        <label for="quota_service_per_day" class="block text-sm font-medium text-ink">
+          Service filter — leads / day
+        </label>
+        <input
+          type="number"
+          id="quota_service_per_day"
+          name="quota_service_per_day"
+          value="{{QUOTA_SERVICE_PER_DAY}}"
+          min="0"
+          max="50000"
+          step="1"
+          class="mt-2 block w-32 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40"
+        />
+      </div>
+    </div>
+
+    <div class="mt-6 ml-7 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        hx-post="/admin/settings/save?section=6"
+        hx-target="#save-pill-6"
+        hx-swap="innerHTML"
+        hx-include="closest form"
+        class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
+      >
+        Save quotas
+      </button>
+      <span id="save-pill-6" class="text-xs"></span>
+    </div>
+  </form>
+</section>
+
+<!-- 07. Output channels -->
+<section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <form>
+    <div class="flex items-baseline gap-3">
+      <span class="font-mono text-xs text-slate-400">07.</span>
+      <h2 class="text-sm font-semibold text-ink">Output channels</h2>
+    </div>
+    <p class="mt-1 ml-7 text-xs text-slate-500">
+      Where today's daily drop is delivered. Disable a channel to skip it on the
+      next cycle without deleting credentials.
+    </p>
+
+    <div class="mt-4 ml-7 space-y-3">
+      <div class="flex items-center gap-3">
+        <label class="relative inline-flex cursor-pointer items-center">
+          <input type="checkbox" name="output_sheet_enabled" value="1" {{OUTPUT_SHEET_ENABLED_CHECKED}} class="peer sr-only">
+          <div class="peer h-6 w-11 rounded-full bg-slate-200 peer-checked:bg-brand after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+        </label>
+        <span class="text-sm text-ink">Google Sheet</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <label class="relative inline-flex cursor-pointer items-center">
+          <input type="checkbox" name="output_api_enabled" value="1" {{OUTPUT_API_ENABLED_CHECKED}} class="peer sr-only">
+          <div class="peer h-6 w-11 rounded-full bg-slate-200 peer-checked:bg-brand after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+        </label>
+        <span class="text-sm text-ink">JSON API</span>
+      </div>
+    </div>
+
+    <div class="mt-6 ml-7 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        hx-post="/admin/settings/save?section=7"
+        hx-target="#save-pill-7"
+        hx-swap="innerHTML"
+        hx-include="closest form"
+        class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
+      >
+        Save channels
+      </button>
+      <span id="save-pill-7" class="text-xs"></span>
+    </div>
+  </form>
+</section>
+
+<!-- 08. AI narrative -->
+<section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <form>
+    <div class="flex items-baseline gap-3">
+      <span class="font-mono text-xs text-slate-400">08.</span>
+      <h2 class="text-sm font-semibold text-ink">AI narrative</h2>
+    </div>
+    <p class="mt-1 ml-7 text-xs text-slate-500">
+      Off uses static templates; on uses OpenRouter Lightweight in production.
+      The prototype always pulls from fixtures regardless of this toggle.
+    </p>
+
+    <div class="mt-4 ml-7 flex items-center gap-3">
+      <label class="relative inline-flex cursor-pointer items-center">
+        <input type="checkbox" name="ai_narrative_enabled" value="1" {{AI_NARRATIVE_ENABLED_CHECKED}} class="peer sr-only">
+        <div class="peer h-6 w-11 rounded-full bg-slate-200 peer-checked:bg-brand after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+      </label>
+      <span class="text-sm text-ink">Use AI-generated narrative</span>
+    </div>
+
+    <div class="mt-6 ml-7 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        hx-post="/admin/settings/save?section=8"
+        hx-target="#save-pill-8"
+        hx-swap="innerHTML"
+        hx-include="closest form"
+        class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
+      >
+        Save AI setting
+      </button>
+      <span id="save-pill-8" class="text-xs"></span>
+    </div>
+  </form>
+</section>

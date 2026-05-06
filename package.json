@@ -1,0 +1,33 @@
+{
+  "name": "hendon-signal-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx src/lib/seed.ts",
+    "generate-signals": "tsx src/lib/signals/index.ts",
+    "seed-history": "tsx src/lib/seed-history.ts",
+    "classify": "tsx src/lib/classifier.ts",
+    "fill-reasons": "tsx src/lib/narrative.ts",
+    "write-sheet": "tsx src/lib/sheets.ts",
+    "seed-sheet-tabs": "tsx src/lib/seed-sheet-tabs.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "better-sqlite3": "^12.9.0",
+    "csv-parse": "^6.2.1",
+    "dotenv": "^16.4.7",
+    "googleapis": "^171.4.0",
+    "hono": "^4.6.14"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

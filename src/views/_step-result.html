@@ -1,0 +1,92 @@
+<!-- Step-3 Result fragment. Returned by POST /admin/upload/commit/:id.
+     Replaces #work-card-content via htmx innerHTML swap.
+     The OOB block at the end refreshes the "Last upload" tile. -->
+
+<div class="space-y-6">
+  <!-- Step indicator -->
+  <div class="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.18em]">
+    <span class="text-slate-400">01. Upload <span class="ml-1 text-emerald-600">✓</span></span>
+    <span class="text-slate-300">·</span>
+    <span class="text-slate-400">02. Review <span class="ml-1 text-emerald-600">✓</span></span>
+    <span class="text-slate-300">·</span>
+    <span class="text-brand-dark">03. Commit</span>
+  </div>
+
+  <!-- Confirmation banner -->
+  <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+    <div class="flex items-start gap-3">
+      <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+      </svg>
+      <div>
+        <h2 class="text-base font-semibold text-emerald-900">Upload committed</h2>
+        <p class="mt-1 text-sm text-emerald-800">{{FILENAME}}</p>
+      </div>
+    </div>
+    <dl class="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Inserted</dt>
+        <dd class="mt-1 text-lg font-semibold text-emerald-900">{{INSERTED}}</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Updated</dt>
+        <dd class="mt-1 text-lg font-semibold text-emerald-900">{{UPDATED}}</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Skipped</dt>
+        <dd class="mt-1 text-lg font-semibold text-emerald-900">{{SKIPPED}}</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Errors</dt>
+        <dd class="mt-1 text-lg font-semibold text-emerald-900">{{ERRORED}}</dd>
+      </div>
+    </dl>
+    {{SOFT_DELETE_LINE}}
+  </div>
+
+  <!-- Auto-enrich summary -->
+  <section class="rounded-2xl border border-slate-200 bg-white p-5">
+    <h3 class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+      Auto-enrich preview
+    </h3>
+    <p class="mt-2 text-sm text-slate-700">
+      <strong>{{ENRICHED}}</strong> new agencies got an initial tier and a Reason line drawn from the fixture pool.
+      The full Serper / OpenRouter Lightweight enrichment loop kicks in when you set a lead quota.
+    </p>
+    <dl class="mt-4 grid grid-cols-3 gap-x-6">
+      <div class="rounded-lg bg-amber-50 px-3 py-2 text-center">
+        <dt class="text-xs font-semibold uppercase tracking-wider text-amber-800">Hot</dt>
+        <dd class="mt-1 text-lg font-semibold text-ink">{{HOT}}</dd>
+      </div>
+      <div class="rounded-lg bg-brand/10 px-3 py-2 text-center">
+        <dt class="text-xs font-semibold uppercase tracking-wider text-brand-dark">Warm</dt>
+        <dd class="mt-1 text-lg font-semibold text-ink">{{WARM}}</dd>
+      </div>
+      <div class="rounded-lg bg-slate-100 px-3 py-2 text-center">
+        <dt class="text-xs font-semibold uppercase tracking-wider text-slate-700">Long-term</dt>
+        <dd class="mt-1 text-lg font-semibold text-ink">{{LONG_TERM}}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- Action row -->
+  <div class="flex flex-wrap items-center justify-end gap-3 border-t border-slate-200 pt-5">
+    <a
+      href="/admin/upload"
+      class="mr-auto text-sm font-medium text-slate-600 hover:text-slate-900"
+    >Upload another</a>
+    <a
+      href="/admin/quota"
+      class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
+    >Set lead quota →</a>
+  </div>
+</div>
+
+<!-- OOB swaps: refresh the Last upload tile and the Recent uploads table on the same page. -->
+<div id="last-upload-content" hx-swap-oob="innerHTML">
+  {{LAST_UPLOAD_TILE}}
+</div>
+
+<div id="recent-uploads-content" hx-swap-oob="innerHTML">
+  {{RECENT_UPLOADS_TABLE}}
+</div>
